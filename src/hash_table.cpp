@@ -18,26 +18,62 @@ namespace itis {
     }
 
     // Tip: allocate hash-table buckets
+      buckets_ = std::vector<Bucket>{};
+      buckets_.resize(capacity);
   }
 
   std::optional<std::string> HashTable::Search(int key) const {
     // Tip: compute hash code (index) and use linear search
+        int hash = HashTable::hash(key);
+        auto list = buckets_[hash];
+        for (const std::pair<int, std::string>& pr : list) {
+            if (pr.first == key) {
+                return pr.second;
+}
+        }
     return std::nullopt;
   }
 
   void HashTable::Put(int key, const std::string &value) {
     // Tip 1: compute hash code (index) to determine which bucket to use
     // Tip 2: consider the case when the key exists (read the docs in the header file)
-
+    int hash = HashTable::hash(key);
+    auto list = buckets_[hash];
+    for (std::pair<int, std::string> pr : list) {
+        if (pr.first == key) {
+            pr.second = value;
+            return;
+        }
+    }
     if (static_cast<double>(num_keys_) / buckets_.size() >= load_factor_) {
       // Tip 3: recompute hash codes (indices) for key-value pairs (create a new hash-table)
       // Tip 4: use utils::hash(key, size) to compute new indices for key-value pairs
+        std::vector<Bucket> new_bucket_arr = std::vector<Bucket>{};
+        auto new_size = buckets_.size() * kGrowthCoefficient;
+        new_bucket_arr.resize(new_size);
+        for (Bucket& bucket : buckets_){
+            for (std::pair<int, std::string> pr : bucket){
+                auto new_index = utils::hash(pr.first, new_size);
+                new_bucket_arr[new_index].push_back(pr);
+            }
+        }
+        buckets_ = new_bucket_arr;
+
     }
   }
 
   std::optional<std::string> HashTable::Remove(int key) {
     // Tip 1: compute hash code (index) to determine which bucket to use
     // TIp 2: find the key-value pair to remove and make a copy of value to return
+    int hash = HashTable::hash(key);
+    auto list = buckets_[hash];
+    for (auto pr : list) {
+        if (pr.first==key) {
+            auto result = pr.second;
+            list.remove(pr);
+            return result;
+        }
+    }
     return std::nullopt;
   }
 
