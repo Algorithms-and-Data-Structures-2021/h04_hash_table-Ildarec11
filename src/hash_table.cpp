@@ -26,10 +26,10 @@ namespace itis {
     // Tip: compute hash code (index) and use linear search
         int hash = HashTable::hash(key);
         auto list = buckets_[hash];
-        for (const std::pair<int, std::string>& pr : list) {
+        for (std::pair<int, std::string> pr : list) {
             if (pr.first == key) {
                 return pr.second;
-}
+            }
         }
     return std::nullopt;
   }
@@ -44,9 +44,10 @@ namespace itis {
             pr.second = value;
             return;
         }
+    }
         buckets_[hash].push_back(std::pair(key, value));
         num_keys_++;
-    }
+
     if (static_cast<double>(num_keys_) / buckets_.size() >= load_factor_) {
       // Tip 3: recompute hash codes (indices) for key-value pairs (create a new hash-table)
       // Tip 4: use utils::hash(key, size) to compute new indices for key-value pairs
@@ -55,8 +56,8 @@ namespace itis {
         new_bucket_arr.resize(new_size);
         for (Bucket& bucket : buckets_){
             for (std::pair<int, std::string> pr : bucket){
-                auto new_index = utils::hash(pr.first, new_size);
-                new_bucket_arr[new_index].push_back(pr);
+                auto new_hash = utils::hash(pr.first, new_size);
+                new_bucket_arr[new_hash].push_back(pr);
             }
         }
         buckets_ = new_bucket_arr;
@@ -72,7 +73,7 @@ namespace itis {
     for (auto pr : list) {
         if (pr.first==key) {
             auto result = pr.second;
-            list.remove(pr);
+            buckets_[hash].remove(pr);
             return result;
         }
     }
