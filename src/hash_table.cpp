@@ -44,6 +44,8 @@ namespace itis {
             pr.second = value;
             return;
         }
+        buckets_[hash].push_back(std::pair(key, value));
+        num_keys_++;
     }
     if (static_cast<double>(num_keys_) / buckets_.size() >= load_factor_) {
       // Tip 3: recompute hash codes (indices) for key-value pairs (create a new hash-table)
